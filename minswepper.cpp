@@ -44,14 +44,6 @@ int main(int argc, char const *argv[])
 		}
 	}
 
-	for (int i = 0; i < ROWS; i++)
-	{
-		for (int j = 0; j < COLS; j++)
-		{
-			grid[i][j].MinesNearby = countMines(i, j);
-		}
-	}
-
 	int mineToPlace = (int)(ROWS * COLS * 0.1f);
 	while (mineToPlace > 0)
 	{
@@ -62,6 +54,14 @@ int main(int argc, char const *argv[])
 		{
 			grid[i][j].containsMine = true;
 			mineToPlace--;
+		}
+	}
+
+	for (int i = 0; i < ROWS; i++)
+	{
+		for (int j = 0; j < COLS; j++)
+		{
+			grid[i][j].MinesNearby = countMines(i, j);
 		}
 	}
 
@@ -105,6 +105,10 @@ void DrawCells(Cell cell)
 		else
 		{
 			DrawRectangle(cell.i * cellWidth, cell.j * cellHeight, cellWidth, cellHeight, GRAY);
+			if (cell.MinesNearby)
+			{
+				DrawText(TextFormat("%d", cell.MinesNearby), cell.i * cellWidth + 10, cell.j * cellHeight + 6, 25, RED);
+			}
 		}
 	}
 
