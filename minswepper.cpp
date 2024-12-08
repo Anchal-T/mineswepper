@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdlib.h>
 #include <raylib.h>
 
 #define ROWS 10
@@ -14,11 +15,15 @@ typedef struct Cell
 {
 	int i;
 	int j;
+	bool containsMine;
+	bool revealed;
 } Cell;
 
 Cell grid[ROWS][COLS];
 
 void DrawCells(Cell);
+bool IsValid(int, int);
+void IsRevealed(int, int);
 
 int main(int argc, char const *argv[])
 {
@@ -28,13 +33,35 @@ int main(int argc, char const *argv[])
 		for(int j=0; j<COLS; j++){
 			grid[i][j] = (Cell){
 				.i = i,
-				.j = j
+				.j = j,
+				.containsMine = false,
+				.revealed = true
 			};
+		}
+	}
+
+	int mineToPlace = (int)(ROWS * COLS * 0.1f);
+	while(mineToPlace > 0){
+		int i = rand() % COLS;
+		int j = rand() % ROWS;
+
+		if(!grid[i][j].containsMine){
+			grid[i][j].containsMine = true;
+			mineToPlace--;
 		}
 	}
 
 	while (!WindowShouldClose())
 	{
+		if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+			Vector2 mPos = GetMousePosition();
+			int IndexI = mPos.x/cellWidth;
+			int IndexJ = mPos.y/cellWidth;
+
+			if(IsValid(IndexI, IndexJ)){
+				IsRevealed(IndexI, IndexJ);
+			}
+		}
 		BeginDrawing();
 		ClearBackground(WHITE);
 		for (int i = 0; i < ROWS; ++i)
@@ -53,5 +80,25 @@ int main(int argc, char const *argv[])
 
 void DrawCells(Cell cell)
 {
+	if(cell.revealed){
+		if(cell.containsMine){
+			DrawRectangle(cell.i * cellWidth, cell.j * cellHeight, cellWidth, cellHeight, RED);
+		}
+		else{
+			DrawRectangle(cell.i * cellWidth, cell.j * cellHeight, cellWidth, cellHeight, GRAY);
+		}
+	}
+	
 	DrawRectangleLines(cell.i * cellWidth, cell.j * cellHeight, cellWidth, cellHeight, LIGHTGRAY);
+}
+
+bool IsValid(int I, int J){
+	if(I >=0 && I < COLS && J >=0 && J < ROWS){
+		return true;
+	}
+	return false;
+}
+
+void IsRevealed(int I, int J){
+	grid[I][J].revealed = true;
 }
