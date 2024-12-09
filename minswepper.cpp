@@ -30,14 +30,19 @@ int countMines(int, int);
 void IsCellFlagged(int, int);
 
 Texture2D flagTexture;
+Texture2D bombTexture;
 
 int main(int argc, char const *argv[])
 {
 	InitWindow(screenHeight, screenWidth, "Minswepper");
-	
+
 	Image flagImage = LoadImage("resources/minswepper_flag.png");
 	flagTexture = LoadTextureFromImage(flagImage);
 	UnloadImage(flagImage);
+
+	Image bombImage = LoadImage("resources/minswepper_bomb.png");
+	bombTexture = LoadTextureFromImage(bombImage);
+	UnloadImage(bombImage);
 
 	for (int i = 0; i < ROWS; i++)
 	{
@@ -87,7 +92,8 @@ int main(int argc, char const *argv[])
 				IsRevealed(IndexI, IndexJ);
 			}
 		}
-		else if(IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)){
+		else if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
+		{
 			Vector2 mPos = GetMousePosition();
 			int IndexI = mPos.x / cellWidth;
 			int IndexJ = mPos.y / cellWidth;
@@ -119,7 +125,11 @@ void DrawCells(Cell cell)
 	{
 		if (cell.containsMine)
 		{
-			DrawRectangle(cell.i * cellWidth, cell.j * cellHeight, cellWidth, cellHeight, RED);
+			Rectangle src = {0, 0, (float)bombTexture.width, (float)bombTexture.height};
+			Rectangle dest = {(float)cell.i * cellWidth, (float)cell.j * cellHeight, cellWidth, cellHeight};
+			Vector2 origin = {0, 0};
+
+			DrawTexturePro(bombTexture, src, dest, origin, 0, WHITE);
 		}
 		else
 		{
@@ -130,9 +140,10 @@ void DrawCells(Cell cell)
 			}
 		}
 	}
-	else if(cell.flag){
-		Rectangle src = {0, 0, flagTexture.width, flagTexture.height};
-		Rectangle dest = {cell.i * cellWidth, cell.j * cellHeight, cellWidth, cellHeight};
+	else if (cell.flag)
+	{
+		Rectangle src = {0, 0, (float)flagTexture.width, (float)flagTexture.height};
+		Rectangle dest = {(float)cell.i * cellWidth, (float)cell.j * cellHeight, cellWidth, cellHeight};
 		Vector2 origin = {0, 0};
 
 		DrawTexturePro(flagTexture, src, dest, origin, 0, RED);
@@ -152,7 +163,8 @@ bool IsValid(int I, int J)
 
 void IsRevealed(int I, int J)
 {
-	if(grid[I][J].flag || grid[I][J].revealed){
+	if (grid[I][J].flag || grid[I][J].revealed)
+	{
 		return;
 	}
 	grid[I][J].revealed = true;
@@ -185,7 +197,8 @@ int countMines(int i, int j)
 
 void IsCellFlagged(int i, int j)
 {
-	if(grid[i][j].revealed){
+	if (grid[i][j].revealed)
+	{
 		return;
 	}
 
