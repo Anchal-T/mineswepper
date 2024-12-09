@@ -28,12 +28,14 @@ bool IsValid(int, int);
 void IsRevealed(int, int);
 int countMines(int, int);
 void IsCellFlagged(int, int);
+void ClearGrid(int, int);
 
 Texture2D flagTexture;
 Texture2D bombTexture;
 
 int main(int argc, char const *argv[])
 {
+	srand(time(NULL));
 	InitWindow(screenHeight, screenWidth, "Minswepper");
 
 	Image flagImage = LoadImage("resources/minswepper_flag.png");
@@ -168,6 +170,10 @@ void IsRevealed(int I, int J)
 		return;
 	}
 	grid[I][J].revealed = true;
+
+	if(grid[I][J].MinesNearby == 0){
+		ClearGrid(I, J);
+	}
 }
 
 int countMines(int i, int j)
@@ -203,4 +209,22 @@ void IsCellFlagged(int i, int j)
 	}
 
 	grid[i][j].flag = !grid[i][j].flag;
+}
+
+void ClearGrid(int i, int j){
+	for (int I = -1; I <= 1; I++)
+	{
+		for (int J = -1; J <= 1; J++)
+		{
+			if (I == 0 && J == 0)
+			{
+				continue;
+			}
+			else if (!IsValid(i + I, j + J))
+			{
+				continue;
+			}
+			IsRevealed(i + I, j + J);
+		}
+	}
 }
