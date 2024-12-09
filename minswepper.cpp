@@ -18,6 +18,7 @@ typedef struct Cell
 	bool containsMine;
 	bool revealed;
 	int MinesNearby;
+	bool flag;
 } Cell;
 
 Cell grid[ROWS][COLS];
@@ -26,10 +27,17 @@ void DrawCells(Cell);
 bool IsValid(int, int);
 void IsRevealed(int, int);
 int countMines(int, int);
+void IsCellFlagged(int, int);
+
+Texture2D flagTexture;
 
 int main(int argc, char const *argv[])
 {
-	InitWindow(screenHeight, screenWidth, "A window");
+	InitWindow(screenHeight, screenWidth, "Minswepper");
+	
+	Image flagImage = LoadImage("resources/minswepper_flag.png");
+	flagTexture = LoadTextureFromImage(flagImage);
+	UnloadImage(flagImage);
 
 	for (int i = 0; i < ROWS; i++)
 	{
@@ -40,7 +48,8 @@ int main(int argc, char const *argv[])
 				.j = j,
 				.containsMine = false,
 				.revealed = false,
-				.MinesNearby = -1};
+				.MinesNearby = -1,
+				.flag = false};
 		}
 	}
 
@@ -78,6 +87,16 @@ int main(int argc, char const *argv[])
 				IsRevealed(IndexI, IndexJ);
 			}
 		}
+		else if(IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)){
+			Vector2 mPos = GetMousePosition();
+			int IndexI = mPos.x / cellWidth;
+			int IndexJ = mPos.y / cellWidth;
+
+			if (IsValid(IndexI, IndexJ))
+			{
+				IsCellFlagged(IndexI, IndexJ);
+			}
+		}
 		BeginDrawing();
 		ClearBackground(WHITE);
 		for (int i = 0; i < ROWS; ++i)
@@ -111,6 +130,13 @@ void DrawCells(Cell cell)
 			}
 		}
 	}
+	else if(cell.flag){
+		Rectangle src = {0, 0, flagTexture.width, flagTexture.height};
+		Rectangle dest = {cell.i * cellWidth, cell.j * cellHeight, cellWidth, cellHeight};
+		Vector2 origin = {0, 0};
+
+		DrawTexturePro(flagTexture, src, dest, origin, 0, RED);
+	}
 
 	DrawRectangleLines(cell.i * cellWidth, cell.j * cellHeight, cellWidth, cellHeight, LIGHTGRAY);
 }
@@ -126,6 +152,9 @@ bool IsValid(int I, int J)
 
 void IsRevealed(int I, int J)
 {
+	if(grid[I][J].flag || grid[I][J].revealed){
+		return;
+	}
 	grid[I][J].revealed = true;
 }
 
@@ -152,4 +181,13 @@ int countMines(int i, int j)
 		}
 	}
 	return count;
+}
+
+void IsCellFlagged(int i, int j)
+{
+	if(grid[i][j].revealed){
+		return;
+	}
+
+	grid[i][j].flag = !grid[i][j].flag;
 }
