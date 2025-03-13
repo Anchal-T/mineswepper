@@ -10,7 +10,6 @@ This is a simple implementation of the classic Minesweeper game. The player must
 - **Graphical UI** with flag and mine indicators
 - **Game timer**
 - **Win/lose detection**
-- **First-click safety** (you won't hit a mine on your first click)
 
 ## Prerequisites
 Make sure you have the following installed on your system:
