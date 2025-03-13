@@ -229,7 +229,7 @@ void IsCellFlagged(int i, int j)
 void ClearGrid(int i, int j){
 	for (int I = -1; I <= 1; I++)
 	{
-		for (int J = -1; I <= 1; J++)
+		for (int J = -1; J <= 1; J++)
 		{
 			if (I == 0 && J == 0)
 			{
