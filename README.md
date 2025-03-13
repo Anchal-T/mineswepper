@@ -21,7 +21,7 @@ Make sure you have the following installed on your system:
 ## Installation
 1. **Clone this repository:**
    ```sh
-   git clone https://github.com/yourusername/minesweeper.git
+   git clone https://github.com/Anchal-T/minswepper
    cd minesweeper
    ```
 2. **Ensure Raylib is installed** on your system. The Makefile expects it to be in `$(HOME)/raylib/src`.
