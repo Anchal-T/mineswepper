@@ -41,6 +41,7 @@ void ClearGrid(int, int);
 void game_init();
 void RevealAllMines();
 void CheckWinCondition();
+void PlaceMine(int, int);
 
 Texture2D flagTexture;
 Texture2D bombTexture;
@@ -301,25 +302,38 @@ void game_init(){
 	gameStartTime = GetTime();
 	gameEndTime = 0;
 	
+	// int mineToPlace = (int)(ROWS * COLS * 0.1f);
+	// while (mineToPlace > 0)
+	// {
+	// 	int i = rand() % COLS;
+	// 	int j = rand() % ROWS;
+
+	// 	if (!grid[i][j].containsMine)
+	// 	{
+	// 		grid[i][j].containsMine = true;
+	// 		mineToPlace--;
+	// 	}
+	// }
+
+	// for (int i = 0; i < ROWS; i++)
+	// {
+	// 	for (int j = 0; j < COLS; j++)
+	// 	{
+	// 		grid[i][j].MinesNearby = countMines(i, j);
+	// 	}
+	// }
+
+}
+
+void PlaceMines(int avoidI, int avoidJ){
 	int mineToPlace = (int)(ROWS * COLS * 0.1f);
-	while (mineToPlace > 0)
-	{
+	while(mineToPlace > 0){
 		int i = rand() % COLS;
 		int j = rand() % ROWS;
 
-		if (!grid[i][j].containsMine)
-		{
+		if(!grid[i][j].containsMine && !(i == avoidI && j == avoidJ)){
 			grid[i][j].containsMine = true;
 			mineToPlace--;
 		}
 	}
-
-	for (int i = 0; i < ROWS; i++)
-	{
-		for (int j = 0; j < COLS; j++)
-		{
-			grid[i][j].MinesNearby = countMines(i, j);
-		}
-	}
-
 }
