@@ -5,10 +5,11 @@
 #define ROWS 10
 #define COLS 10
 
-const int screenHeight = 400;
+const int headerHeight = 60;  // Add header space
+const int screenHeight = 400 + headerHeight;  // Increase total height
 const int screenWidth = 400;
 
-const int cellHeight = screenHeight / ROWS;
+const int cellHeight = (screenHeight - headerHeight) / ROWS;  // Adjust cell height
 const int cellWidth = screenWidth / COLS;
 
 typedef struct Cell
@@ -52,117 +53,138 @@ bool firstClick = true;
 
 int main(int argc, char const *argv[])
 {
-	srand(time(NULL));
-	InitWindow(screenHeight, screenWidth, "Minswepper");
+    srand(time(NULL));
+    InitWindow(screenWidth, screenHeight, "Minswepper");  // Use new height
 
-	Image flagImage = LoadImage("resources/minswepper_flag.png");
-	flagTexture = LoadTextureFromImage(flagImage);
-	UnloadImage(flagImage);
+    Image flagImage = LoadImage("resources/minswepper_flag.png");
+    flagTexture = LoadTextureFromImage(flagImage);
+    UnloadImage(flagImage);
 
-	Image bombImage = LoadImage("resources/minswepper_bomb.png");
-	bombTexture = LoadTextureFromImage(bombImage);
-	UnloadImage(bombImage);
+    Image bombImage = LoadImage("resources/minswepper_bomb.png");
+    bombTexture = LoadTextureFromImage(bombImage);
+    UnloadImage(bombImage);
 
-	game_init();
+    game_init();
 
-	while (!WindowShouldClose())
-	{
-		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-		{
-			Vector2 mPos = GetMousePosition();
-			int IndexI = mPos.x / cellWidth;
-			int IndexJ = mPos.y / cellHeight;
+    while (!WindowShouldClose())
+    {
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            Vector2 mPos = GetMousePosition();
+            int IndexI = mPos.x / cellWidth;
+            int IndexJ = (mPos.y - headerHeight) / cellHeight;  // Adjust for header
 
-			if (IsValid(IndexI, IndexJ))
-			{
-				IsRevealed(IndexI, IndexJ);
-			}
-		}
-		else if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
-		{
-			Vector2 mPos = GetMousePosition();
-			int IndexI = mPos.x / cellWidth;
-			int IndexJ = mPos.y / cellHeight;
+            if (IsValid(IndexI, IndexJ) && mPos.y >= headerHeight)  // Check if click is below header
+            {
+                IsRevealed(IndexI, IndexJ);
+            }
+        }
+        else if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
+        {
+            Vector2 mPos = GetMousePosition();
+            int IndexI = mPos.x / cellWidth;
+            int IndexJ = (mPos.y - headerHeight) / cellHeight;  // Adjust for header
 
-			if (IsValid(IndexI, IndexJ))
-			{
-				IsCellFlagged(IndexI, IndexJ);
-			}
-		}
-		else if(IsKeyPressed(KEY_R)){
-			game_init();
-		}
-		
-		BeginDrawing();
-		ClearBackground(WHITE);
-		
-		for (int i = 0; i < ROWS; ++i)
-		{
-			for (int j = 0; j < COLS; ++j)
-			{
-				DrawCells(grid[i][j]);
-			}
-		}
-		
-		if(state == PLAYING) {
-			CheckWinCondition();
-		}
-		
-		if(state == LOSE){
-			DrawRectangle(screenWidth/2 - 120, screenHeight/2 - 30, 240, 60, Color{0, 0, 0, 180});
-			DrawText("Game Over", screenWidth/2 - 100, screenHeight/2 - 20, 40, RED);
-		} else if(state == WIN) {
-			DrawRectangle(screenWidth/2 - 100, screenHeight/2 - 30, 200, 60, Color{0, 0, 0, 180});
-			DrawText("You Win!", screenWidth/2 - 80, screenHeight/2 - 20, 40, GREEN);
-		}
-		
-		if(state == PLAYING) {
-			float currentTime = GetTime() - gameStartTime;
-			DrawText(TextFormat("Time: %.1f", currentTime), 10, 10, 20, BLACK);
-		} else {
-			float finalTime = gameEndTime - gameStartTime;
-			DrawText(TextFormat("Final Time: %.1f", finalTime), 10, 10, 20, BLACK);
-		}
-		
-		EndDrawing();
-	}
+            if (IsValid(IndexI, IndexJ) && mPos.y >= headerHeight)  // Check if click is below header
+            {
+                IsCellFlagged(IndexI, IndexJ);
+            }
+        }
+        else if(IsKeyPressed(KEY_R)){
+            game_init();
+        }
+        
+        BeginDrawing();
+        ClearBackground(WHITE);
+        
+        // Draw header background
+        DrawRectangle(0, 0, screenWidth, headerHeight, LIGHTGRAY);
+        DrawLine(0, headerHeight, screenWidth, headerHeight, DARKGRAY);
+        
+        // Draw timer
+        if(state == PLAYING) {
+            float currentTime = GetTime() - gameStartTime;
+            DrawText(TextFormat("Time: %.1f", currentTime), 10, 15, 20, BLACK);
+        } else {
+            float finalTime = gameEndTime - gameStartTime;
+            DrawText(TextFormat("Time: %.1f", finalTime), 10, 15, 20, BLACK);
+        }
+        
+        // Draw mine counter
+        int totalMines = (int)(ROWS * COLS * 0.1f);
+        int flaggedCells = 0;
+        for (int i = 0; i < ROWS; i++)
+        {
+            for (int j = 0; j < COLS; j++)
+            {
+                if (grid[i][j].flag) flaggedCells++;
+            }
+        }
+        int remainingMines = totalMines - flaggedCells;
+        DrawText(TextFormat("Mines: %d", remainingMines), screenWidth - 120, 15, 20, BLACK);
+        
+        // Draw restart instruction
+        DrawText("Press R to restart", screenWidth/2 - 80, 35, 16, DARKGRAY);
+        
+        // Draw grid with offset
+        for (int i = 0; i < ROWS; ++i)
+        {
+            for (int j = 0; j < COLS; ++j)
+            {
+                DrawCells(grid[i][j]);
+            }
+        }
+        
+        if(state == LOSE){
+            DrawRectangle(screenWidth/2 - 120, screenHeight/2 - 30, 240, 60, Color{0, 0, 0, 180});
+            DrawText("Game Over", screenWidth/2 - 100, screenHeight/2 - 20, 40, RED);
+        } else if(state == WIN) {
+            DrawRectangle(screenWidth/2 - 100, screenHeight/2 - 30, 200, 60, Color{0, 0, 0, 180});
+            DrawText("You Win!", screenWidth/2 - 80, screenHeight/2 - 20, 40, GREEN);
+        }
+        
+        EndDrawing();
+    }
 
-	CloseWindow();
-	return 0;
+    CloseWindow();
+    return 0;
 }
 
 void DrawCells(Cell cell)
 {	
-		
-	if (cell.revealed)
-	{
-		if (cell.containsMine)
-		{
-			Rectangle src = {0, 0, (float)bombTexture.width, (float)bombTexture.height};
-			Rectangle dest = {(float)cell.i * cellWidth, (float)cell.j * cellHeight, cellWidth, cellHeight};
-			Vector2 origin = {0, 0};
+    // Offset all cell drawing by headerHeight
+    int cellX = cell.i * cellWidth;
+    int cellY = cell.j * cellHeight + headerHeight;
+        
+    if (cell.revealed)
+    {
+        if (cell.containsMine)
+        {
+            Rectangle src = {0, 0, (float)bombTexture.width, (float)bombTexture.height};
+            Rectangle dest = {(float)cellX, (float)cellY, cellWidth, cellHeight};
+            Vector2 origin = {0, 0};
 
-			DrawTexturePro(bombTexture, src, dest, origin, 0, WHITE);
-		}
-		else
-		{
-			DrawRectangle(cell.i * cellWidth, cell.j * cellHeight, cellWidth, cellHeight, GRAY);
-			if (cell.MinesNearby)
-			{
-				DrawText(TextFormat("%d", cell.MinesNearby), cell.i * cellWidth + 10, cell.j * cellHeight + 6, 25, RED);
-			}
-		}
-	}
-	else if (cell.flag)
-	{
-		Rectangle src = {0, 0, (float)flagTexture.width, (float)flagTexture.height};
-		Rectangle dest = {(float)cell.i * cellWidth, (float)cell.j * cellHeight, cellWidth, cellHeight};
-		Vector2 origin = {0, 0};
+            DrawTexturePro(bombTexture, src, dest, origin, 0, WHITE);
+        }
+        else
+        {
+            DrawRectangle(cellX, cellY, cellWidth, cellHeight, GRAY);
+            if (cell.MinesNearby)
+            {
+                DrawText(TextFormat("%d", cell.MinesNearby), cellX + 10, cellY + 6, 25, RED);
+            }
+        }
+    }
+    else if (cell.flag)
+    {
+        Rectangle src = {0, 0, (float)flagTexture.width, (float)flagTexture.height};
+        Rectangle dest = {(float)cellX, (float)cellY, cellWidth, cellHeight};
+        Vector2 origin = {0, 0};
 
-		DrawTexturePro(flagTexture, src, dest, origin, 0, RED);
-	}
+        DrawTexturePro(flagTexture, src, dest, origin, 0, RED);
+    }
 
-	DrawRectangleLines(cell.i * cellWidth, cell.j * cellHeight, cellWidth, cellHeight, LIGHTGRAY);
+    DrawRectangleLines(cellX, cellY, cellWidth, cellHeight, LIGHTGRAY);
 }
 
 bool IsValid(int I, int J)
