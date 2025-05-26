@@ -41,7 +41,7 @@ void ClearGrid(int, int);
 void game_init();
 void RevealAllMines();
 void CheckWinCondition();
-void PlaceMine(int, int);
+void PlaceMines(int, int);
 
 Texture2D flagTexture;
 Texture2D bombTexture;
@@ -183,7 +183,7 @@ void IsRevealed(int I, int J)
 
 	if(firstClick){
 		firstClick = false;
-		PlaceMine(I, J);
+		PlaceMines(I, J);
 
 		for(int i=0; i<ROWS; i++){
 			for(int j=0; j<COLS; j++){
