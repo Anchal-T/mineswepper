@@ -71,7 +71,7 @@ int main(int argc, char const *argv[])
 		{
 			Vector2 mPos = GetMousePosition();
 			int IndexI = mPos.x / cellWidth;
-			int IndexJ = mPos.y / cellWidth;
+			int IndexJ = mPos.y / cellHeight;
 
 			if (IsValid(IndexI, IndexJ))
 			{
@@ -82,7 +82,7 @@ int main(int argc, char const *argv[])
 		{
 			Vector2 mPos = GetMousePosition();
 			int IndexI = mPos.x / cellWidth;
-			int IndexJ = mPos.y / cellWidth;
+			int IndexJ = mPos.y / cellHeight;
 
 			if (IsValid(IndexI, IndexJ))
 			{
