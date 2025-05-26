@@ -48,6 +48,7 @@ Texture2D bombTexture;
 
 float gameStartTime;
 float gameEndTime;
+bool firstClick = true;
 
 int main(int argc, char const *argv[])
 {
@@ -179,6 +180,18 @@ void IsRevealed(int I, int J)
 	{
 		return;
 	}
+
+	if(firstClick){
+		firstClick = false;
+		PlaceMine(I, J);
+
+		for(int i=0; i<ROWS; i++){
+			for(int j=0; j<COLS; j++){
+				grid[i][j].MinesNearby = countMines(i, j);
+			}
+		}
+	}
+
 	grid[I][J].revealed = true;
 
 	if(grid[I][J].containsMine){
@@ -301,7 +314,7 @@ void game_init(){
 	state = PLAYING;
 	gameStartTime = GetTime();
 	gameEndTime = 0;
-	
+	firstClick = true;
 	// int mineToPlace = (int)(ROWS * COLS * 0.1f);
 	// while (mineToPlace > 0)
 	// {
