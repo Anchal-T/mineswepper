@@ -344,6 +344,17 @@ void PlaceMines(int avoidI, int avoidJ){
 		int i = rand() % COLS;
 		int j = rand() % ROWS;
 
+		bool tooClose = false;
+		for(int ti=-1; ti<=1; ti++){
+			for(int tj=-1; tj<=1; tj++){
+				if(ti == avoidI + ti && tj == avoidJ + tj){
+					tooClose = true;
+					break;
+				}
+			}
+			if(tooClose) break;
+		}
+
 		if(!grid[i][j].containsMine && !(i == avoidI && j == avoidJ)){
 			grid[i][j].containsMine = true;
 			mineToPlace--;
