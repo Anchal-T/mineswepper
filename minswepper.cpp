@@ -369,7 +369,7 @@ void PlaceMines(int avoidI, int avoidJ){
 		bool tooClose = false;
 		for(int ti=-1; ti<=1; ti++){
 			for(int tj=-1; tj<=1; tj++){
-				if(ti == avoidI + ti && tj == avoidJ + tj){
+				if(i == avoidI + ti && j == avoidJ + tj){
 					tooClose = true;
 					break;
 				}
