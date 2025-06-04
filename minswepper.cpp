@@ -171,7 +171,9 @@ void DrawCells(Cell cell)
             DrawRectangle(cellX, cellY, cellWidth, cellHeight, GRAY);
             if (cell.MinesNearby)
             {
-                DrawText(TextFormat("%d", cell.MinesNearby), cellX + 10, cellY + 6, 25, RED);
+                Color numberColors[] = {BLUE, GREEN, RED, PURPLE, MAROON, DARKBLUE, BLACK, GRAY};
+                Color textColor = (cell.MinesNearby <= 8) ? numberColors[cell.MinesNearby - 1] : BLACK;
+                DrawText(TextFormat("%d", cell.MinesNearby), cellX + 10, cellY + 6, 25, textColor);
             }
         }
     }
